@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// input: an integer k and a prime p, where p is congruent to ±2 mod 5
+// input: an integer k and an odd number p, where p is congruent to ±2 mod 5
 // output: the (k+1)th Fibonacci number mod p
 
 int main(int argc, char* argv[]){

@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <math.h>
 
-// input: an integer p
-// first: check that the input is congruent to ±2 mod 5
-// if so, run Fermat primality test with base 2
+
+// input: an odd integer p that is congruent to ± 2 mod 5
+// run Fermat primality test with base 2
 
 int flt(int argc, char *argv[]){
 
