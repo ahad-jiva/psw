@@ -23,18 +23,24 @@ int fast_fib(int n, int p){
     mpz_fib_ui(fib, n);
     mpz_fdiv_r(r, fib, mod);
 
-    return mpz_get_ui(r);
+    int return_val = mpz_get_ui(r);
 
+    mpz_clear(fib);
+    mpz_clear(r);
+    mpz_clear(mod);
+
+    return return_val;
 }
 
 int verify(int candidate){
     int sup = sqrt(candidate);
-    for (int i = 3; i < sup; i+=2){
+    for (int i = 3; i <= sup; i+=2){
         if (candidate % i == 0){
-            printf("%llu\n", candidate);
-            throw std::invalid_argument("not a prime");
+            std::cout << candidate << std::endl;
+            throw std::invalid_argument(" not a prime\n");
         }
     }
+    return 1;
 }
 
 // computes base^power % mod
@@ -57,7 +63,7 @@ int bin_exp(int base, int power, int mod){
 // run Fermat primality test with base 2
 int flt(int p){
 
-    // check first condition
+    // check first condition (congruent to ±2 mod 5)
     int test = p % 5;
     if ((test == 2) || (test == 3)){
         return bin_exp(2, p-1, p);
@@ -73,7 +79,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 
     for (int i = 37335333; i < 2147483647; i += 2){
         if (fast_fib(i+1, i) == 0 && flt(i) == 1){
-            std::cout << i << " Passed Fibonacci test and FLT. Verifying..." << std::endl;
+            std::cout << i << " Passed PSW test. Verifying..." << std::endl;
             try {
                 verify(i);
                 std::cout << i << " verified as prime. 🟢" << std::endl;
