@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
                 std::cout << i << " verified as prime. 🟢" << std::endl;
             }
             catch (std::invalid_argument& e){
-                std::cout << i << " Failed verification, not a prime. 🔴" << std::endl;
+                std::cout << i << " failed verification, not a prime. 🔴" << std::endl;
                 return 0;
             }
         } 
