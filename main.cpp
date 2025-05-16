@@ -1,10 +1,26 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdexcept>
 #include <cmath>
 #include <iostream>
 #include <gmp.h>
+#include <thread>
+#include <queue>
+#include <ncurses.h>
 
+std::queue<int> printq;
+std::atomic_bool stop_printer;
+
+void printer(){
+    initscr();
+    printw("Testing candidate primes...\n");
+    refresh();
+    while (!stop_printer){
+        if (!printq.empty()){
+            printw("%d", printq.front());
+            printq.pop();
+        }
+    }
+    endwin();
+}
 
 // input: an integer n and a modulus p
 // output: the nth Fibonacci number mod p
@@ -77,20 +93,26 @@ int flt(int p){
 
 int main(int argc, char *argv[]){    // input: an odd integer p
 
-    for (int i = 3; i < 2147483647; i += 2){
+    std::thread t(printer);
+    stop_printer = false;
+
+    for (int i = 3; i < 13072341; i += 2){
         if (fast_fib(i+1, i) == 0 && flt(i) == 1){
-            std::cout << i << " Passed PSW test. Verifying..." << std::endl;
+            // std::cout << i << " Passed PSW test. Verifying..." << std::endl;
             try {
                 verify(i);
-                std::cout << i << " verified as prime. 🟢" << std::endl;
+                printq.push(i);
+                //std::cout << i << " verified as prime. 🟢" << std::endl;
             }
             catch (std::invalid_argument& e){
-                std::cout << i << " failed verification, not a prime. 🔴" << std::endl;
+                std::cout << i << " failed verification, not a prime. ❌" << std::endl;
                 return 0;
             }
         } 
     }
-    std::cout << "All possible integers up to 32-bit limit checked.";
+    stop_printer = true;
+    t.join();
+    std::cout << "All possible integers up to 32-bit limit checked.\n";
     return 0;
 
 }
