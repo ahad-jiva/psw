@@ -77,7 +77,7 @@ int flt(int p){
 
 int main(int argc, char *argv[]){    // input: an odd integer p
 
-    for (int i = 37335333; i < 2147483647; i += 2){
+    for (int i = 3; i < 2147483647; i += 2){
         if (fast_fib(i+1, i) == 0 && flt(i) == 1){
             std::cout << i << " Passed PSW test. Verifying..." << std::endl;
             try {
@@ -94,5 +94,8 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 
 }
 
-// HOW TO COMPILE:
+// MAC COMPILE:
 // clang++ main.cpp -o main -I /opt/homebrew/include -L/opt/homebrew/lib -lgmp
+
+// LINUX COMPILE:
+// g++ main.cpp -o main -lgmp
