@@ -90,6 +90,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
             }
         } 
     }
+    std::cout << "All possible integers up to 32-bit limit checked.";
     return 0;
 
 }

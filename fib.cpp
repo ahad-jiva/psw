@@ -1,24 +1,23 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <thread>
+#include <iostream>
 
 // input: an integer k and an odd number p, where p is congruent to ±2 mod 5
 // output: the (k+1)th Fibonacci number mod p
 
+int x = 10;
+
+void func(int i){
+    std::cout << "input is " << i << std::endl;
+    std::cout << "heres a global var " << x << std::endl;
+}
+
 int main(int argc, char* argv[]){
+    x = 11;
+    std::thread t(func, 18);
 
-    int fib_l = atoi(argv[1]) + 1;
-    int mod = atoi(argv[2]);
-
-    int fib[fib_l];
-
-    fib[0] = 0;
-    fib[1] = 1;
-
-    for (int i = 2; i <= fib_l; i++){
-        fib[i] = (fib[i-1] + fib[i-2]) % mod;
-    }
-
-    printf("%d\n", fib[fib_l]);
-    
-
+    t.join();
+    std::cout << "main thread finished" << std::endl;
+    return 0;
 }
