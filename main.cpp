@@ -11,11 +11,12 @@ std::atomic_bool stop_printer;
 
 void printer(){
     initscr();
-    printw("Testing candidate primes...\n");
-    refresh();
     while (!stop_printer){
         if (!printq.empty()){
-            printw("%d", printq.front());
+            printw("Testing candidate primes...\n");
+            printw("%d passed tests and verified.", printq.front());
+            refresh();
+            clear();
             printq.pop();
         }
     }
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     std::thread t(printer);
     stop_printer = false;
 
-    for (int i = 3; i < 13072341; i += 2){
+    for (int i = 3; i < 2147483647; i += 2){
         if (fast_fib(i+1, i) == 0 && flt(i) == 1){
             // std::cout << i << " Passed PSW test. Verifying..." << std::endl;
             try {
@@ -112,6 +113,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     }
     stop_printer = true;
     t.join();
+    std::cout << "Queue still has " << printq.size() << " elements." << std::endl;
     std::cout << "All possible integers up to 32-bit limit checked.\n";
     return 0;
 
