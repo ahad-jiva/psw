@@ -5,6 +5,7 @@
 #include <thread>
 #include <queue>
 #include <ncurses.h>
+#include <atomic>
 
 std::queue<int> printq;
 std::atomic_bool stop_printer;
@@ -14,7 +15,7 @@ void printer(){
     while (!stop_printer){
         if (!printq.empty()){
             printw("Testing candidate primes...\n");
-            printw("%d passed tests and verified 🟢", printq.front());
+            printw("%d passed tests and verified.", printq.front());
             refresh();
             clear();
             printq.pop();
