@@ -50,7 +50,7 @@ int fast_fib(int n, int p){
     return return_val;
 }
 
-int verify(int candidate){
+int verify(int candidate){  // TODO: optimize (dont need to check 5s)
     int sup = sqrt(candidate);
     for (int i = 3; i <= sup; i+=2){
         if (candidate % i == 0){
@@ -98,11 +98,11 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     std::thread t(printer);
     stop_printer = false;
 
-    for (int i = 3; i < 2147483647; i += 2){
-        if (fast_fib(i+1, i) == 0 && flt(i) == 1){
+    for (int i = 3; i < 2147483647; i += 2){    // TODO: optimize to a generating function
+        if (fast_fib(i+1, i) == 0 && flt(i) == 1){  // TODO: multithread
             try {
                 verify(i);
-                printq.push(i);
+                printq.push(i); // send to printing queue
             }
             catch (std::invalid_argument& e){
                 std::cout << i << " failed verification, not a prime. ❌" << std::endl;
@@ -110,9 +110,9 @@ int main(int argc, char *argv[]){    // input: an odd integer p
             }
         } 
     }
-    stop_printer = true;
+    stop_printer = true;    // stop printing even if there are still elements in the print queue
     t.join();
-    std::cout << "Queue still has " << printq.size() << " elements." << std::endl;
+    std::cout << "Queue still has " << printq.size() << " elements." << std::endl; // just making sure
     std::cout << "All possible integers up to 32-bit limit checked.\n";
     return 0;
 
