@@ -123,3 +123,5 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 
 // LINUX COMPILE:
 // g++ main.cpp -o main -lgmp -lncurses
+
+// current progress: 22855967
