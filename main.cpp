@@ -6,20 +6,19 @@
 #include <queue>
 #include <ncurses.h>
 #include <atomic>
+#include <unistd.h>
 
-std::queue<int> printq;
-std::atomic_bool stop_printer;
+std::atomic_int progress;
+std::atomic_bool printing;
 
 void printer(){
     initscr();
-    while (!stop_printer){
-        if (!printq.empty()){
-            printw("Testing candidate primes...\n");
-            printw("%d passed tests and verified.", printq.front());
-            refresh();
-            clear();
-            printq.pop();
-        }
+    while (printing){
+        printw("Testing candidate primes...\n");
+        printw("%d passed tests and verified.", progress.load());
+        refresh();
+        clear();
+        usleep(100000);
     }
     endwin();
 }
@@ -162,29 +161,30 @@ int verify(int candidate){  // using wheel factorization mod 30 with unrolled lo
     for (int base = 0; base <= sup; base += 30){ // TODO: invert conditions for fewer d<=sup checks
         int d = 0;
 
-        d = base + 1;
-        if (d > 5 && d <= sup && candidate % d == 0) goto fail;
-
-        d = base + 7;
-        if (d <= sup && candidate % d == 0) goto fail;
-
-        d = base + 11;
-        if (d <= sup && candidate % d == 0) goto fail;
-
-        d = base + 13;
-        if (d <= sup && candidate % d == 0) goto fail;
-
-        d = base + 17;
-        if (d <= sup && candidate % d == 0) goto fail;
-
-        d = base + 19;
+        d = base + 29;
         if (d <= sup && candidate % d == 0) goto fail;
 
         d = base + 23;
-        if (d <= sup && candidate % d == 0) goto fail;
+        if (candidate % d == 0) goto fail; 
 
-        d = base + 29;
-        if (d <= sup && candidate % d == 0) goto fail;
+        d = base + 19;
+        if (candidate % d == 0) goto fail; 
+
+        d = base + 17;
+        if (candidate % d == 0) goto fail;
+        
+        d = base + 13;
+        if (candidate % d == 0) goto fail;
+
+        d = base + 11;
+        if (candidate % d == 0) goto fail;
+
+        d = base + 7;
+        if (candidate % d == 0) goto fail;
+
+        d = base + 1;
+        if (d > 5 && candidate % d == 0) goto fail;
+      
     }
 
     return 1;
@@ -229,15 +229,15 @@ int bin_exp(int base, int power, int mod){
 
 int main(int argc, char *argv[]){    // input: an odd integer p
 
-    // std::thread t(printer);
-    stop_printer = false;
-
+    std::thread t(printer);
+    progress = 0;
+    printing = true;
     int sign = -1;
     for (int i = 22855967; i < 2147483647; i += (5 + sign)){
         if (bin_exp(2, i-1, i) == 1 && fast_fib(i+1, i) == 0){
             try {
                 verify(i);
-                //printq.push(i); // send to printing queue
+                progress = i; // send to printing queue
             }
             catch (std::invalid_argument& e){
                 std::cout << i << " failed verification, not a prime. ❌" << std::endl;
@@ -246,9 +246,8 @@ int main(int argc, char *argv[]){    // input: an odd integer p
         }
         sign *= -1;
     }
-    // stop_printer = true;    // stop printing even if there are still elements in the print queue
-    // t.join();
-    //std::cout << "Queue still has " << printq.size() << " elements." << std::endl; // just making sure
+    printing = false;
+    t.join();
     std::cout << "All possible integers up to 32-bit limit checked." << std::endl;
     return 0;
 
@@ -260,4 +259,4 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 // LINUX COMPILE:
 // g++ main.cpp -o main -lgmp -lncurses -O3 -ffast-math -march=native
 
-// current progress: 22855967 / 2147483647
+// current progress: 36880747 / 2147483647
