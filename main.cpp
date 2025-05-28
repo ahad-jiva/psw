@@ -8,17 +8,17 @@
 #include <atomic>
 #include <unistd.h>
 
-std::atomic_int progress;
+std::atomic_uint progress;
 std::atomic_bool printing;
 
 void printer(){
     initscr();
     while (printing){
         printw("Testing candidate primes...\n");
-        printw("%d passed tests and verified.", progress.load());
+        printw("%u passed tests and verified.", progress.load());
         refresh();
         clear();
-        usleep(100000);
+        usleep(10000);
     }
     endwin();
 }
@@ -90,7 +90,7 @@ void printer(){
 //     mpz_clears(a, b, t1, t2, temp, NULL);
 // }
 
-int fast_fib(int n, int p) {
+int fast_fib(unsigned int n, unsigned int p) {
     mpz_t Fn, mod;
     mpz_inits(Fn, mod, NULL);
     mpz_set_ui(mod, p);
@@ -139,9 +139,9 @@ int fast_fib(int n, int p) {
     return result;
 }
 
-int isqrt(int n){
-    int x = n;
-    int y = (x + 1) / 2;
+unsigned int isqrt(unsigned int n){
+    unsigned int x = n;
+    unsigned int y = (x + 1) / 2;
     while (y < x){
         x = y;
         y = (x + n / x) / 2;
@@ -149,7 +149,7 @@ int isqrt(int n){
     return x;
 }
 
-int verify(int candidate){  // using wheel factorization mod 30 with unrolled loop for speed
+int verify(unsigned int candidate){  // using wheel factorization mod 30 with unrolled loop for speed
 
     if (candidate % 3 == 0) {
         std::cout << candidate << std::endl;
@@ -196,7 +196,7 @@ int verify(int candidate){  // using wheel factorization mod 30 with unrolled lo
 
 // computes base^power % mod using binary exponentiation
 // essentially Fermat primality test with base 2
-int bin_exp(int base, int power, int mod){
+int bin_exp(int base, unsigned int power, unsigned int mod){
     int result = 1;
     base %= mod;
 
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     progress = 0;
     printing = true;
     int sign = -1;
-    for (int i = 22855967; i < 2147483647; i += (5 + sign)){
+    for (unsigned int i = 2147483647; i < 4294967295; i += (5 + sign)){
         if (bin_exp(2, i-1, i) == 1 && fast_fib(i+1, i) == 0){
             try {
                 verify(i);
@@ -261,4 +261,4 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 // LINUX COMPILE:
 // g++ main.cpp -o main -lgmp -lncurses -O3 -ffast-math -march=native
 
-// current progress: 36880747 / 2147483647
+// current progress: 2147483647 / 4294967295
