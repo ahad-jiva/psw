@@ -50,18 +50,62 @@ int fast_fib(int n, int p){
     return return_val;
 }
 
-int verify(int candidate){  // TODO: optimize (dont need to check 5s)
-    int sup = sqrt(candidate);
-    for (int i = 3; i <= sup; i+=2){
-        if (candidate % i == 0){
-            std::cout << candidate << std::endl;
-            throw std::invalid_argument(" not a prime\n");
-        }
+int isqrt(int n){
+    int x = n;
+    int y = (x + 1) / 2;
+    while (y < x){
+        x = y;
+        y = (x + n / x) / 2;
     }
-    return 1;
+    return x;
 }
 
-// computes base^power % mod
+int verify(int candidate){  // using wheel factorization mod 30 with unrolled loop for speed
+
+    if (candidate % 3 == 0) {
+        std::cout << candidate << std::endl;
+        throw std::invalid_argument(" not a prime\n");
+    }
+
+    int sup = isqrt(candidate);
+
+    for (int base = 0; base <= sup; base += 30){
+        int d = 0;
+
+        d = base + 1;
+        if (d > 5 && d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 7;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 11;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 13;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 17;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 19;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 23;
+        if (d <= sup && candidate % d == 0) goto fail;
+
+        d = base + 29;
+        if (d <= sup && candidate % d == 0) goto fail;
+    }
+
+    return 1;
+
+    fail:
+        std::cout << candidate << std::endl;
+        throw std::invalid_argument(" not a prime\n");
+}
+
+// computes base^power % mod using binary exponentiation
+// essentially Fermat primality test with base 2
 int bin_exp(int base, int power, int mod){
     int result = 1;
     base %= mod;
@@ -77,20 +121,20 @@ int bin_exp(int base, int power, int mod){
 }
 
 
-// input: an odd integer p
-// run Fermat primality test with base 2
-int flt(int p){
+// // input: an odd integer p
+// // run Fermat primality test with base 2
+// int flt(int p){
 
-    // check first condition (congruent to ±2 mod 5)
-    int test = p % 5;
-    if ((test == 2) || (test == 3)){
-        return bin_exp(2, p-1, p);
-    }
-    else
-    {
-        return 0; // not congruent to ±2 mod 5
-    }
-}
+//     // check first condition (congruent to ±2 mod 5)
+//     int test = p % 5;
+//     if ((test == 2) || (test == 3)){
+//         return bin_exp(2, p-1, p);
+//     }
+//     else
+//     {
+//         return 0; // not congruent to ±2 mod 5
+//     }
+// }
 
 
 int main(int argc, char *argv[]){    // input: an odd integer p
@@ -98,8 +142,9 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     std::thread t(printer);
     stop_printer = false;
 
-    for (int i = 3; i < 2147483647; i += 2){    // TODO: optimize to a generating function
-        if (fast_fib(i+1, i) == 0 && flt(i) == 1){  // TODO: multithread
+    int sign = -1;
+    for (int i = 22855967; i < 2147483647; i += (5 + sign)){
+        if (bin_exp(2, i-1, i) == 1 && fast_fib(i+1, i) == 0){
             try {
                 verify(i);
                 printq.push(i); // send to printing queue
@@ -108,7 +153,8 @@ int main(int argc, char *argv[]){    // input: an odd integer p
                 std::cout << i << " failed verification, not a prime. ❌" << std::endl;
                 return 0;
             }
-        } 
+        }
+        sign *= -1;
     }
     stop_printer = true;    // stop printing even if there are still elements in the print queue
     t.join();
@@ -119,9 +165,9 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 }
 
 // MAC COMPILE:
-// clang++ main.cpp -o main -I /opt/homebrew/include -L/opt/homebrew/lib -lgmp -lncurses
+// clang++ main.cpp -o main -I /opt/homebrew/include -L/opt/homebrew/lib -lgmp -lncurses -O3 -ffast-math -march=native
 
 // LINUX COMPILE:
-// g++ main.cpp -o main -lgmp -lncurses
+// g++ main.cpp -o main -lgmp -lncurses -O3 -ffast-math -march=native
 
 // current progress: 22855967
