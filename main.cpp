@@ -240,6 +240,8 @@ int main(int argc, char *argv[]){    // input: an odd integer p
                 progress = i; // send to printing queue
             }
             catch (std::invalid_argument& e){
+                printing = false;
+                t.join(); // stop printing progress and kill thread
                 std::cout << i << " failed verification, not a prime. ❌" << std::endl;
                 return 0;
             }
