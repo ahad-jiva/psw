@@ -156,10 +156,10 @@ int verify(unsigned int candidate){  // using wheel factorization mod 30 with un
         throw std::invalid_argument(" not a prime\n");
     }
 
-    int sup = isqrt(candidate);
+    unsigned int sup = isqrt(candidate);
 
-    for (int base = 0; base <= sup; base += 30){ // TODO: invert conditions for fewer d<=sup checks
-        int d = 0;
+    for (unsigned int base = 0; base <= sup; base += 30){ // TODO: invert conditions for fewer d<=sup checks
+        unsigned int d = 0;
 
         d = base + 29;
         if (d <= sup && candidate % d == 0) goto fail;
