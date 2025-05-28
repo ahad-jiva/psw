@@ -26,3 +26,47 @@ int flt(int argc, char *argv[]){
         }
     }
 }
+
+// int verify(int candidate){  // using wheel factorization mod 30 with unrolled loop
+
+//     if (candidate % 3 == 0) {
+//         std::cout << candidate << std::endl;
+//         throw std::invalid_argument(" not a prime\n");
+//     }
+
+//     int sup = isqrt(candidate);
+
+//     for (int base = 0; base <= sup; base += 30){
+//         int d = 0;
+
+//         d = base + 1;
+//         if (d > 5 && d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 7;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 11;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 13;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 17;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 19;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 23;
+//         if (d <= sup && candidate % d == 0) goto fail;
+
+//         d = base + 29;
+//         if (d <= sup && candidate % d == 0) goto fail;
+//     }
+
+//     return 1;
+
+//     fail:
+//         std::cout << candidate << std::endl;
+//         throw std::invalid_argument(" not a prime\n");
+// }

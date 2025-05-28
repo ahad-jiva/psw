@@ -26,28 +26,118 @@ void printer(){
 
 // input: an integer n and a modulus p
 // output: the nth Fibonacci number mod p
-int fast_fib(int n, int p){
+// int fast_fib(int n, int p){
     
-    mpz_t fib;
-    mpz_t r;
-    mpz_t mod;
+//     mpz_t fib;
+//     mpz_t r;
+//     mpz_t mod;
 
-    mpz_init(fib);
-    mpz_init(r);
-    mpz_init(mod);
+//     mpz_init(fib);
+//     mpz_init(r);
+//     mpz_init(mod);
 
+//     mpz_set_ui(mod, p);
+
+//     mpz_fib_ui(fib, n);
+//     mpz_fdiv_r(r, fib, mod);
+
+//     int return_val = mpz_get_ui(r);
+
+//     mpz_clear(fib);
+//     mpz_clear(r);
+//     mpz_clear(mod);
+
+//     return return_val;
+// }
+
+// void fib_mod(mpz_t Fn, int n, const mpz_t mod) {
+//     mpz_t a, b, t1, t2, temp;
+//     mpz_inits(a, b, t1, t2, temp, NULL);
+
+//     mpz_set_ui(a, 0);
+//     mpz_set_ui(b, 1);
+
+//     for (int i = 31 - __builtin_clz(n); i >= 0; --i) {
+//         // F(2k) = F(k) * [2*F(k+1) − F(k)]
+//         // F(2k+1) = F(k)^2 + F(k+1)^2
+
+//         // t1 = 2*b - a
+//         mpz_mul_ui(t1, b, 2);
+//         mpz_sub(t1, t1, a);
+//         mpz_mod(t1, t1, mod);
+
+//         // t1 = a * t1
+//         mpz_mul(t1, a, t1);
+//         mpz_mod(t1, t1, mod);  // t1 = F(2k)
+
+//         // t2 = a^2 + b^2
+//         mpz_mul(t2, a, a);
+//         mpz_mul(temp, b, b);
+//         mpz_add(t2, t2, temp);
+//         mpz_mod(t2, t2, mod);  // t2 = F(2k+1)
+
+//         if ((n >> i) & 1) {
+//             mpz_set(a, t2);        // F(n) = F(2k+1)
+//             mpz_add(b, t1, t2);    // F(n+1) = F(2k) + F(2k+1)
+//             mpz_mod(b, b, mod);
+//         } else {
+//             mpz_set(a, t1);        // F(n) = F(2k)
+//             mpz_set(b, t2);        // F(n+1) = F(2k+1)
+//         }
+//     }
+
+//     mpz_set(Fn, a);  // F(n) mod mod
+
+//     mpz_clears(a, b, t1, t2, temp, NULL);
+// }
+
+int fast_fib(int n, int p) {
+    mpz_t Fn, mod;
+    mpz_inits(Fn, mod, NULL);
     mpz_set_ui(mod, p);
 
-    mpz_fib_ui(fib, n);
-    mpz_fdiv_r(r, fib, mod);
+    mpz_t a, b, t1, t2, temp;
+    mpz_inits(a, b, t1, t2, temp, NULL);
 
-    int return_val = mpz_get_ui(r);
+    mpz_set_ui(a, 0);
+    mpz_set_ui(b, 1);
 
-    mpz_clear(fib);
-    mpz_clear(r);
-    mpz_clear(mod);
+    for (int i = 31 - __builtin_clz(n); i >= 0; --i) {
+        // F(2k) = F(k) * [2*F(k+1) − F(k)]
+        // F(2k+1) = F(k)^2 + F(k+1)^2
 
-    return return_val;
+        // t1 = 2*b - a
+        mpz_mul_ui(t1, b, 2);
+        mpz_sub(t1, t1, a);
+        mpz_mod(t1, t1, mod);
+
+        // t1 = a * t1
+        mpz_mul(t1, a, t1);
+        mpz_mod(t1, t1, mod);  // t1 = F(2k)
+
+        // t2 = a^2 + b^2
+        mpz_mul(t2, a, a);
+        mpz_mul(temp, b, b);
+        mpz_add(t2, t2, temp);
+        mpz_mod(t2, t2, mod);  // t2 = F(2k+1)
+
+        if ((n >> i) & 1) {
+            mpz_set(a, t2);        // F(n) = F(2k+1)
+            mpz_add(b, t1, t2);    // F(n+1) = F(2k) + F(2k+1)
+            mpz_mod(b, b, mod);
+        } else {
+            mpz_set(a, t1);        // F(n) = F(2k)
+            mpz_set(b, t2);        // F(n+1) = F(2k+1)
+        }
+    }
+
+    mpz_set(Fn, a);  // F(n) mod mod
+
+    mpz_clears(a, b, t1, t2, temp, NULL);
+    int result = mpz_get_ui(Fn);
+
+    mpz_clears(Fn, mod, NULL);
+    return result;
 }
 
 int isqrt(int n){
@@ -69,7 +159,7 @@ int verify(int candidate){  // using wheel factorization mod 30 with unrolled lo
 
     int sup = isqrt(candidate);
 
-    for (int base = 0; base <= sup; base += 30){
+    for (int base = 0; base <= sup; base += 30){ // TODO: invert conditions for fewer d<=sup checks
         int d = 0;
 
         d = base + 1;
@@ -139,7 +229,7 @@ int bin_exp(int base, int power, int mod){
 
 int main(int argc, char *argv[]){    // input: an odd integer p
 
-    std::thread t(printer);
+    // std::thread t(printer);
     stop_printer = false;
 
     int sign = -1;
@@ -147,7 +237,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
         if (bin_exp(2, i-1, i) == 1 && fast_fib(i+1, i) == 0){
             try {
                 verify(i);
-                printq.push(i); // send to printing queue
+                //printq.push(i); // send to printing queue
             }
             catch (std::invalid_argument& e){
                 std::cout << i << " failed verification, not a prime. ❌" << std::endl;
@@ -156,10 +246,10 @@ int main(int argc, char *argv[]){    // input: an odd integer p
         }
         sign *= -1;
     }
-    stop_printer = true;    // stop printing even if there are still elements in the print queue
-    t.join();
-    std::cout << "Queue still has " << printq.size() << " elements." << std::endl; // just making sure
-    std::cout << "All possible integers up to 32-bit limit checked.\n";
+    // stop_printer = true;    // stop printing even if there are still elements in the print queue
+    // t.join();
+    //std::cout << "Queue still has " << printq.size() << " elements." << std::endl; // just making sure
+    std::cout << "All possible integers up to 32-bit limit checked." << std::endl;
     return 0;
 
 }
@@ -170,4 +260,4 @@ int main(int argc, char *argv[]){    // input: an odd integer p
 // LINUX COMPILE:
 // g++ main.cpp -o main -lgmp -lncurses -O3 -ffast-math -march=native
 
-// current progress: 22855967
+// current progress: 22855967 / 2147483647
