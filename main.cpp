@@ -322,7 +322,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     int sign = -1;
     const size_t target_queue_size = 10000; // Target number of candidates in queue
     
-    for (uint64_t i = 2147483647ULL; i < 4294967295ULL && !done; i += (5 + sign)){
+    for (uint64_t i = 4294967295ULL; i < 18446744073709551615ULL && !done; i += (5 + sign)){
         // Wait if queue is too full
         while (work_queue.size() > target_queue_size * 2 && !done) {
             usleep(100); // Short wait
