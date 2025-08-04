@@ -139,7 +139,7 @@ void printer(){
                 last_time = current_time;
             }
         }
-        usleep(100000); // Sleep for 0.1 seconds
+        usleep(250000); // Sleep for 0.25 seconds
     }
     endwin();
 }
