@@ -12,9 +12,11 @@
 #include <condition_variable>
 #include <vector>
 #include <chrono>
+#include <string>
 
 std::atomic_uint64_t progress;
 std::atomic_uint64_t numbers_processed;
+std::atomic_uint64_t current_testing;
 std::atomic_bool printing;
 std::atomic_bool done;
 std::atomic_uint64_t thread_count;
@@ -66,6 +68,7 @@ void worker_thread() {
     uint64_t candidate;
     while (work_queue.pop(candidate)) {
         numbers_processed++;
+        current_testing = candidate; // Track current number being tested
         
         // Test Fermat primality first
         if (bin_exp(2, candidate-1, candidate) == 1) {
@@ -104,6 +107,7 @@ void printer(){
         size_t current_queue_size = work_queue.size();
         uint64_t current_processed = numbers_processed.load();
         uint64_t current_threads = thread_count.load();
+        uint64_t current_testing_num = current_testing.load();
         auto current_time = std::chrono::steady_clock::now();
         
         // Update smoothed rate every 10 iterations (1 second)
@@ -128,10 +132,10 @@ void printer(){
                 clear();
                 printw("Testing candidate primes...\n");
                 printw("Threads: %lu\n", current_threads);
-                printw("Latest candidate: %lu\n", current_progress);
+                printw("Currently testing: %s\n", std::to_string(current_testing_num).c_str());
                 printw("Candidates in queue: %zu\n", current_queue_size);
                 printw("Processing rate: %.1f numbers/sec\n", smoothed_rate);
-                printw("Total processed: %lu\n", current_processed);
+                printw("Total processed: %s\n", std::to_string(current_processed).c_str());
                 refresh();
                 last_progress = current_progress;
                 last_queue_size = current_queue_size;
@@ -308,6 +312,7 @@ int main(int argc, char *argv[]){    // input: an odd integer p
     std::thread printer_thread(printer);
     progress = 0;
     numbers_processed = 0;
+    current_testing = 0;
     thread_count = num_threads;
     printing = true;
     done = false;
